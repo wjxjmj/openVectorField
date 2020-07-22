@@ -1,6 +1,6 @@
 % The class vectorFieldis designed to easy simulation of ode systems by
 % developing a wrapper of the ode45 function.
-% Auther: wjxjmj(github) ĞÇÃ¢(zhihu.com)
+% Auther: wjxjmj(github) ÃÃ‡ÃƒÂ¢(zhihu.com)
 % E-mail: wjxjmj@126.com
 % Initial uploading time: 2020-07-22
 % To start with, the vectorField has two arguments including a structure
@@ -19,10 +19,10 @@
 % ------k=1;
 % ------mySystem = vectorField(state0,@(t,state)myModel(t,state,k));
 % ------function dot = myModel(~,state,k)
-%         ©®---x=state.x;
-%         ©®---v=state.v;
-%         ©®---dot.x=v; 
-%         ©®---dot.v=-x-k*v; 
+%         Â©Â®---x=state.x;
+%         Â©Â®---v=state.v;
+%         Â©Â®---dot.x=v; 
+%         Â©Â®---dot.v=-x-k*v; 
 % ------end
 % Here, remeber to put down the function "myModel" to the tail of the m
 % file if "myModel" is not seperated in a single m file.
@@ -68,7 +68,10 @@ classdef vectorField < handle
             end
         end
         
-        function [t,data,last]=ode45(self,tspan,stime,state0)
+        function [t,data,last]=ode45(self,tspan,state0,stime)
+            if nargin==3
+                stime=tspan(2);
+            end
             self.stime=stime;
             self.initWaitBar('');
             [t,stream]=ode45(self.functionHandle,tspan,self.toVector(state0));
