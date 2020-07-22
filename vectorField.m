@@ -116,7 +116,7 @@ classdef vectorField < handle
                 s2 = size(state.(names{i}));
                 assert(isequal(s1,s2),['You are trying to change the size of "',names{i},'", please check it.'...
                                       ,' The size of "',names{i},'" should be ',mat2str(s1),', but the size of "'...
-                                      ,fieldname,'.',names{i},'" is ',mat2str(s2)]);
+                                      ,fieldname,'.',names{i},'" is ',mat2str(s2),'.']);
                 vector(a:b)=state.(names{i})(:);
             end
         end
@@ -126,7 +126,7 @@ classdef vectorField < handle
             vectorname = inputname(2);
             s = length(vector);
             assert(s==self.size_vector,['The size of input vector should to be ',mat2str(self.size_vector),', but the length of "'...
-                                       ,vectorname,'" is ',num2str(s),', please check it']);
+                                       ,vectorname,'" is ',num2str(s),', please check it.']);
             names = fieldnames(self.size_state);
             n = length(names);
             for i=1:n
