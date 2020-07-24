@@ -44,6 +44,7 @@ classdef vectorField < handle
         index_b=[];
         size_vector=[];
         progress_bar=[];
+        functionName=[];
         functionHandle=[];
         stime=[];
     end
@@ -64,6 +65,8 @@ classdef vectorField < handle
                     iter=iter+l;
                 end
                 self.size_vector=iter-1;
+                strSet=regexp(func2str(handle),'(?<=\)).+?(?=\()','match');
+                self.functionName= strSet{1};
                 self.functionHandle=@(t,vector)self.model(t,vector,handle);
             end
         end
@@ -109,14 +112,16 @@ classdef vectorField < handle
             fieldname = inputname(2);
             k = length(names);
             for i=1:k
-                assert(isfield(state,names{i}),['There is no variable named "',names{i},'" in "',fieldname,'", please check it.']);
+                assert(isfield(state,names{i}),['No variable named "',names{i}...
+                                                ,'" found. Please check if the structural variable returned from function "'...
+                                                ,self.functionName,'" contains variable "',names{i},'".']);
                 a = self.index_a.(names{i});
                 b = self.index_b.(names{i});
                 s1 = self.size_state.(names{i});
                 s2 = size(state.(names{i}));
                 assert(isequal(s1,s2),['You are trying to change the size of "',names{i},'", please check it.'...
                                       ,' The size of "',names{i},'" should be ',mat2str(s1),', but the size of "'...
-                                      ,fieldname,'.',names{i},'" is ',mat2str(s2),'.']);
+                                      ,names{i},'" returned from function "',self.functionName,'" is ',mat2str(s2),'.']);
                 vector(a:b)=state.(names{i})(:);
             end
         end
