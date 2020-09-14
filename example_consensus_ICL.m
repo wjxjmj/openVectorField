@@ -40,6 +40,8 @@ sim.setFunctionAfterEachTspan(@(t,state)recording(t,state,mem,para)); % set call
 [t,result]=sim.solve('ode15s',linspace(0,para.stime,para.ICL_Size+1),state,para.resultSize); % solve system using selected solver
 
 % plot result
+% all result are stacked in the structual variable result in the fashion of
+% time*data matrices.
 figure(1)
 plot(result.xd(:,1),result.xd(:,2),'r--');
 hold on
@@ -51,24 +53,34 @@ hold off
 figure(2)
 plot(t,result.th);
 hold on
-plot(t,linspace(para.k,para.k,length(t)));
+plot(t,linspace(para.k,para.k,length(t)),'--');
 hold off
 
+% model function
+% The first two arguments must be the time and a structual state variable,
+% and you can use any more arguments as you want after that.
+% Remeber to return variable with the same structure as the state variable.
 
 function grad = model(t,state,mem,para)
+
+% unpack all states from structual variable 'state'
 x   = state.x;
 xd  = state.xd;
 th  = state.th;
 Y   = state.Y;
 U   = state.U;
 
+% this is the control input variable
 u=zeros(size(x));
+
+% define differential relationship
 dot_x = zeros(size(x));
 dot_xd=-xd;
 dot_th=zeros(size(th));
 dot_Y=zeros(size(Y));
 dot_U=zeros(size(U));
 
+% implemention of the algorithm
 for i=1:para.n
     xi=x(:,i);
     thi=th(:,i);
@@ -77,22 +89,25 @@ for i=1:para.n
             continue
         else
             xj=x(:,j);
-            u(:,i)=u(:,i)+para.ka*(xj-xi);
+            u(:,i)=u(:,i)+para.ka*(xj-xi); % interactions between neighboring agents
         end
     end
-    u(:,i)=u(:,i)-thi.*f(xi)+para.kb*(xd-xi);
-    dot_th(:,i)=(xi-xd)'*xi;
+    u(:,i)=u(:,i)+para.kb*(xd-xi); % leader information feedback
+    u(:,i)=u(:,i)-thi.*f(xi); % adaptive term
+     
+    dot_th(:,i)=(xi-xd)'*xi; % classic adaptive law
     for l=1:mem.n
-        Yi = mem.data.Y{l}(:,i);
-        Ui = mem.data.U{l}(:,i);
-        delta_xi = mem.data.delta_x{l}(:,i);
-        dot_th(:,i)=dot_th(:,i)+Yi'*(delta_xi-Ui-Yi*thi);
+        Yi = mem.data.Y{l}(:,i); % get the l-th Y from memory
+        Ui = mem.data.U{l}(:,i); % get the l-th U from memory
+        delta_xi = mem.data.delta_x{l}(:,i); % get x(t+delta_t)-x(t) from memory
+        dot_th(:,i)=dot_th(:,i)+Yi'*(delta_xi-Ui-Yi*thi); % integral concurrent learning terms
     end
-    dot_x(:,i)=u(:,i)+para.a*f(xi);
-    dot_Y(:,i)=f(xi);
-    dot_U(:,i)=u(:,i);
+    dot_x(:,i)=u(:,i)+para.a*f(xi); % calculate the gradient of x
+    dot_Y(:,i)=f(xi); % integral operation needed in the integral concurrenting learning adaptive control
+    dot_U(:,i)=u(:,i); % same as to the previous line, note that what we need is the integral of the control input, not the gradient of the state x.
 end
 
+% set all gradients
 grad.x  = dot_x;
 grad.xd = dot_xd;
 grad.th = dot_th;
@@ -104,14 +119,20 @@ function y=f(x)
 y=sin(x);
 end
 
+% callback function for ICL.
+% This function will be executed automatically at the end of each
+% simulation time span.
+% The control inputs arguments is defined to your need, but remeber to
+% return a new structual state variable which is used as the initial
+% value for the next simulation time span.
 function new_state = recording(t,state,mem,para)
-new_state = state;
-index = mem.n+1;
+new_state = state; % we can directly copy from state.
+index = mem.n+1; % indexing in matlab is started from 1, not 0
 mem.data.delta_x{index}=state.x-mem.data.xt;
 mem.data.Y{index}=state.Y;
 mem.data.U{index}=state.U;
 mem.data.xt=state.x;
-mem.n=mem.n+1;
-new_state.U=new_state.U.*0;
-new_state.Y=new_state.Y.*0;
+mem.n=mem.n+1;% currently, we must maintain the counter manually.
+new_state.U=new_state.U.*0; % reset the integral variable U
+new_state.Y=new_state.Y.*0; % reset the integral variable Y
 end
