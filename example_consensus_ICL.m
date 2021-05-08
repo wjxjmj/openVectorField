@@ -37,7 +37,8 @@ mem = Memory(data);
 % create a simulation instance
 sim = vectorField(state,@(t,state)model(t,state,mem,para)); % create instance using class 'vectorField'
 sim.setFunctionAfterEachTspan(@(t,state)recording(t,state,mem,para)); % set callback function at the end of each simulation time span
-[t,result]=sim.solve('ode15s',linspace(0,para.stime,para.ICL_Size+1),state,para.resultSize); % solve system using selected solver
+sim.solve('ode15s',linspace(0,para.stime,para.ICL_Size+1),state); % solve system using selected solver
+[t,result]=sim.result(para.resultSize); % collect simulation result.
 
 % plot result
 % all result are stacked in the structual variable result in the fashion of
