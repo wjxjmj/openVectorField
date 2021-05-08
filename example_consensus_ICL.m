@@ -18,6 +18,7 @@ para.a=1; % unknown parameters in the system model
 
 
 % here we define the structual state variable to contain all states
+state=[];
 state.x     =   unifrnd(-3,3,[para.dim,para.n]);
 state.th    =   zeros([1,para.n]);
 state.xd    =   unifrnd(-3,3,[para.dim,1]);
@@ -54,7 +55,7 @@ hold off
 figure(2)
 plot(t,result.th);
 hold on
-plot(t,linspace(para.k,para.k,length(t)),'--');
+plot(t,linspace(para.a,para.a,length(t)),'--');
 hold off
 
 % model function
