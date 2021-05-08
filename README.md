@@ -1,5 +1,5 @@
 # OpenVectorField
-a general ode simulation tool
+A general ode simulation tool
 
 # Delpoyment
 Create an empty folder, for example, YOUR_MATLAB_PATH\toolbox\ovf, and run file install_OVM.m.
@@ -8,7 +8,7 @@ Create an empty folder, for example, YOUR_MATLAB_PATH\toolbox\ovf, and run file 
 
   This library provides a structure-oriented ode simulation framework. The traditional simulation approach requires the variables of an equation to be a vector, which is inefficient and error-prone. To better reduce the mental burden, I have created a new simulation framework that uses structures to describe the variables of the vector field and encapsulates some of the associated methods.
  
-  Example:
+Example:
  
 ## step1:model description
 Suppose that we want to simulate a control system in 2D system:
