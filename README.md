@@ -26,7 +26,7 @@ W first define a structural variable as
 state0.x=unifrnd(-5,5,[2,1]);
 state0.v=unifrnd(-5,5,[2,1]);
 ```
-Note that it is not necessary % to write r into the structure "state0",  because we can get r by defining a function using time t:
+Note that it is not necessary to write r into the structure "state0",  because we can get r by defining a function using time t:
 ```matlab
 para.w=0.2;
 function [r,dr,ddr]=ref(t,para)
@@ -61,7 +61,7 @@ state_end=mySystem.solve('ode45',tspans,state0);
 ```
 Here, method "solve" returns the final result in the form of a structure,  which allows you to take state_end as an argument for the next time period of the simulation.
 
-## step4:visulation
+## step4:add signals
 You may wonder why "solve" does not give you all the simulation results. This is because in most cases, we need to process the simulation data before visualizing it. In this case, what we need may be a tracking trajectory as well as the error curve of position errors. However, calculating the error using the raw simulation data is tedious. Here, we can use method "addSignals" to handle this issue.
 Define a function as
 ```matlab
